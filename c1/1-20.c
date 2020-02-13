@@ -1,48 +1,55 @@
 #include <stdio.h>
-#define MAXLEN 1000
 
-int get_line(char s[], int maxlen);
-void reverses(char s[], int len);
+#define MAXLEN 1000 
+#define TABSTOP 4
+
+// returns len
+int detab(char line[], int maxlen);
 
 int main()
 {
 	int len;
 	char string[MAXLEN];
 
-	while ((len = get_line(string, MAXLEN)) > 0)
+	while ((len = detab(string, MAXLEN)) > 0)
 	{
-		reverses(string, len);
-		printf("%s\n", string);
+		printf("%s", string);
 	}
 }
 
-int get_line(char s[], int maxlen)
+int detab(char s[], int max)
 {
-	int c, i;
+	int c, i, r;
 
-	for (i=0; i<maxlen-1 && (c = getchar())!=EOF && c!='\n'; ++i)
+	i = 0;
+	while (i<max && (c=getchar())!=EOF && c!='\n')
+	{
+		if (c == '\t') 
+		{
+			r = (i + 1) % TABSTOP;
+			while (r <= TABSTOP) 
+			{
+				s[i] = ' ';
+				++i;
+				++r;
+			}
+		}
+		else
+		{
+			s[i] = c;
+			++i;
+		}
+
+	}
+
+	if (c == '\n')
+	{
 		s[i] = c;
+		++i;
+	}
 
 	s[i] = '\0';
 
 	return i;
-}
 
-void reverses(char s[], int len)
-{
-	int i, j;
-	char reversed[MAXLEN];
-
-	--len;
-
-	for (i = 0; len >= 0; --len)
-	{
-		reversed[i] = s[len];
-		++i;
-	}
-
-	reversed[i] = '\0';
-
-	for (j = 0; j <= i; ++j)
-		s[j] = reversed[j];
 }
