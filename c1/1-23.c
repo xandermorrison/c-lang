@@ -31,10 +31,11 @@ void getcode(char s[], int maxlen)
 void clearcomments(char s[])
 {
 	int i = 0, j, k;
+	int inside_quotes = 0;
 
 	while (s[i] != '\0')
 	{
-		if (s[i] == '/')
+		if (s[i] == '/' && !inside_quotes)
 		{
 			j = i;
 			if (s[i + 1] == '/')
@@ -73,6 +74,18 @@ void clearcomments(char s[])
 				}
 				s[i + k] = s[j];
 			}
+		}
+		else if (s[i] == '"')
+		{
+			if (inside_quotes)
+			{
+				inside_quotes = 0;
+			}
+			else
+			{
+				inside_quotes = 1;
+			}
+			++i;
 		}
 		else
 		{

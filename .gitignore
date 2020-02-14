@@ -2,3 +2,5 @@ temp.c
 a.out
 */temp.c
 */a.out
+*.swp
+*/*.swp
