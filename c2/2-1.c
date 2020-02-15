@@ -68,5 +68,5 @@ int main() {
 	printf("ULONG_MAX: %lu\n", ulmax);
 	printf("\n");
 
-	return 1;
+	return 0;
 }
