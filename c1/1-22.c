@@ -21,7 +21,7 @@ int main()
 		printf("%s", s);
 	}
 
-	return 1;
+	return 0;
 }
 
 int fold(char s[], int maxlen)
