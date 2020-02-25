@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #define MAXOP 100
 #define NUMBER '0'
 #define LETTER 'a'
+#define ASSIGN '='
 
 #define PRINT "print"
 #define SWAP "swap"
@@ -18,14 +20,20 @@ int check_strings(char s[], char t[]);
 int getop(char []);
 void push(double);
 double pop(void);
-double print_top(void);
+double get_top(void);
 void duplicate_top(void);
 void swap_top(void);
 void clear_stack(void);
 
+char var_names[46];
+double var_values[46];
+
+int var_index = 0;
+
 int main()
 {
 	int type;
+	int i, found;
 	double op2;
 	char s[MAXOP];
 
@@ -63,13 +71,25 @@ int main()
 				}
 				break;
 			case '\n':
-				printf("\t%.8g\n", print_top());
+				printf("\t%.8g\n", get_top());
 				break;
 
 			/* commands */
 			case LETTER:
-				if (check_strings(s, PRINT)) {
-					printf("\tTOP: %.8g\n", print_top());
+				if (strlen(s) == 1 && var_index > 0) {
+					found = 0;
+					for (i = 0; i < var_index; ++i) {
+						if (s[0] == var_names[i]) {
+							found = 1;
+							push(var_values[i]);
+						}
+					}
+					if (!found) {
+						printf("error: unknown command %s\n", s);
+					}
+				}
+				else if (check_strings(s, PRINT)) {
+					printf("\tTOP: %.8g\n", get_top());
 					break;
 				}
 				else if (check_strings(s, DUP)) {
@@ -98,6 +118,28 @@ int main()
 					printf("error: unknown command %s\n", s);
 				}
 				break;
+			case ASSIGN:
+				if (strlen(s) == 1) {
+					found = 0;
+					if (var_index > 0) {
+						for (i = 0; i < var_index; ++i) {
+							if (var_names[i] == s[0]) {
+								found = 1;
+								var_values[i] = get_top();
+							}
+						}
+					}
+					if (!found) {
+						var_names[var_index] = s[0];
+						var_values[var_index] = get_top();
+						var_index++;
+					}
+				}
+				else {
+					printf("error: unknown command %s\n", s);
+				}
+				break;
+					
 			default:
 				printf("error: unknown command %s\n", s);
 				break;
@@ -146,7 +188,7 @@ double pop(void)
 	}
 }
 
-double print_top(void)
+double get_top(void)
 {
 	if (sp > 0) {
 		return val[sp - 1];
@@ -191,6 +233,7 @@ void clear_stack(void)
 
 int getch(void);
 void ungetch(int);
+void ungets(char []);
 
 int getop(char s[])
 {
@@ -212,9 +255,39 @@ int getop(char s[])
 			ungetch(c);
 			return LETTER;
 		}
+		else if (c == ASSIGN) {
+			c = getch();
+			if (isalpha(c)) {
+				s[0] = c;
+				return ASSIGN;
+			}
+			else {
+				ungetch(c);
+				s[0] = '\0';
+				return c;
+			}
+		}
 		return c;
 	}
 	i = 0;
+	if (c == '-') {
+		c = getch();
+		if (isdigit(c) || c == '.') {
+			s[++i] = c;
+			while (isdigit(s[++i] = c = getch())) {
+				;
+			}
+		}
+		else {
+			ungetch(c);
+			return '-';
+		}
+		if (c == '.') {
+			while (isdigit(s[++i] = c = getch())) {
+				;
+			}
+		}
+	}
 	if (isdigit(c)) {
 		while (isdigit(s[++i] = c = getch())) {
 			;
@@ -225,27 +298,14 @@ int getop(char s[])
 			;
 		}
 	}
-	if (c == '-') {
-		c = getch();
-		if (isdigit(c)) {
-			s[++i] = c;
-			while (isdigit(s[++i] = c = getch())) {
-				;
-			}
-		}
-		else {
-			ungetch(c);
-			return '-';
-		}
-	}
-	s[i] = '\0'';
+	s[i] = '\0';
 	if (c != EOF) {
 		ungetch(c);
 	}
 	return NUMBER;
 }
 
-#define BUFSIZE 100
+#define BUFSIZE 1
 
 char buf[BUFSIZE];
 int bufp = 0;
@@ -263,5 +323,16 @@ void ungetch(int c)
 	}
 	else {
 		buf[bufp++] = c;
+	}
+}
+
+void ungets(char s[])
+{
+	int i;
+
+	// ungetch string backwards because getch is stack
+
+	for (i = strlen(s) - 1; i >= 0; --i) {
+		ungetch(s[i]);
 	}
 }
