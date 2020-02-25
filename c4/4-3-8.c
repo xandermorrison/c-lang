@@ -1,9 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define MAXOP 100
 #define NUMBER '0'
+#define LETTER 'a'
 
+#define PRINT "print"
+#define SWAP "swap"
+#define CLEAR "clear"
+#define DUP "duplicate"
+#define SIN "sin"
+#define EXP "exp"
+#define POW "pow"
+
+int check_strings(char s[], char t[]);
 int getop(char []);
 void push(double);
 double pop(void);
@@ -56,25 +67,55 @@ int main()
 				break;
 
 			/* commands */
-			case 'p':
-				printf("\tTOP: %.8g\n", print_top());
-				break;
-			case 'd':
-				printf("\t%s\n", "DUPLICATING");
-				duplicate_top();
-				break;
-			case 's':
-				printf("\t%s\n", "SWAPPING");
-				swap_top();
-				break;
-			case 'c':
-				printf("\t%s\n", "CLEARING");
-				clear_stack();
+			case LETTER:
+				if (check_strings(s, PRINT)) {
+					printf("\tTOP: %.8g\n", print_top());
+					break;
+				}
+				else if (check_strings(s, DUP)) {
+					printf("\t%s\n", "DUPLICATING");
+					duplicate_top();
+				}
+				else if (check_strings(s, SWAP)) {
+					printf("\t%s\n", "SWAPPING");
+					swap_top();
+				}
+				else if (check_strings(s, CLEAR)) {
+					printf("\t%s\n", "CLEARING");
+					clear_stack();
+				}
+				else if (check_strings(s, SIN)) {
+					push(sin(pop()));
+				}
+				else if (check_strings(s, EXP)) {
+					push(exp(pop()));
+				}
+				else if (check_strings(s, POW)) {
+					op2 = pop();
+					push(pow(pop(), op2));
+				}
+				else {
+					printf("error: unknown command %s\n", s);
+				}
 				break;
 			default:
 				printf("error: unknown command %s\n", s);
 				break;
 		}
+	}
+	return 0;
+}
+
+int check_strings(char s[], char t[])
+{
+	int i, j;
+
+	for (i = j = 0; s[i] == t[j] && s[i] != '\0'; ++i, ++j) {
+		;
+	}
+
+	if (t[j] == '\0') {
+		return 1;
 	}
 	return 0;
 }
@@ -162,6 +203,15 @@ int getop(char s[])
 	s[1] = '\0';
 
 	if (!isdigit(c) && c != '.' && c != '-') {
+		if (isalpha(c)) {
+			i = 0;
+			while (isalpha(s[++i] = c = getch())) {
+				;
+			}
+			s[i] = '\0';
+			ungetch(c);
+			return LETTER;
+		}
 		return c;
 	}
 	i = 0;
@@ -188,7 +238,7 @@ int getop(char s[])
 			return '-';
 		}
 	}
-	s[i] = '\0';
+	s[i] = '\0'';
 	if (c != EOF) {
 		ungetch(c);
 	}
