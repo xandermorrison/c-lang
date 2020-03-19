@@ -112,7 +112,7 @@ int bufp;
 
 int getch(void)
 {
-	return (bufp > 0) ? buf[bufp--] : getchar();
+	return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
 void ungetch(int c)
