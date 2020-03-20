@@ -36,11 +36,6 @@ int main(int argc, char *argv[])
 	}
 
 	while (get_word(word, MAXWORD) != EOF) {
-		/*printf("%s\n", word);
-		printf("B: %d\n", in_blk_comment);
-		printf("S: %d\n", in_string);
-		printf("L: %d\n", in_line_comment);
-		printf("\n");*/
 		if (isalpha(word[0]) && check_pattern(p, word) &&
 				!in_string && !in_line_comment && !in_blk_comment) {
 			v = insert_variable(v, word);
