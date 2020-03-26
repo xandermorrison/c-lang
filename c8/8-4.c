@@ -186,6 +186,22 @@ int fclose(FILE *fp)
 	return 0;
 }
 
+int fseek(FILE *fp, long offset, int origin)
+{
+	if (fp->base == NULL) {
+		return 1;
+	}
+	if (fp->flag & _WRITE) {
+		fflush(fp);
+	}
+	fp->ptr = fp->base;
+	fp->cnt = 0;
+	if (lseek(fp->fd, offset, origin) == -1) {
+		return 2;
+	}
+	return 0;
+}
+
 int main()
 {
 	FILE *fp, *fa;
@@ -193,6 +209,9 @@ int main()
 
 	fp = f_open("test.txt", "r");
 	fa = f_open("out.txt", "w");
+
+	fseek(fp, 2, 0);
+	fseek(fp, 2, 1);
 
 	while ((c = getc(fp)) != EOF) {
 		putc(c, fa);
