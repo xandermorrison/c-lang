@@ -30,21 +30,6 @@ int main()
 	printf("%d\n", v[0]);
 }
 
-void *c_alloc(unsigned n, unsigned size)
-{
-	long *p;
-	int i;
-
-	if ((p = (long *)m_alloc(n * size)) == NULL) {
-		return NULL;
-	}
-	for (i = 0; i < n; i++) {
-		p[i] = 0;
-	}
-
-	return p;
-}
-
 void *m_alloc(unsigned nbytes)
 {
 	Header *p, *prevp;
@@ -124,4 +109,15 @@ void free(void *ap)
 		p->s.ptr = bp;
 	}
 	freep = p;
+}
+
+void bfree(void *b, unsigned n)
+{
+	Header *bp;
+	if (n < (sizeof(Header) + 1)) {
+		return NULL;
+	}
+	bp = (Header *)b;
+	bp->s.size = (n + sizeof(Header) - 1)/sizeof(Header) + 1;
+	free(bp+1);
 }
